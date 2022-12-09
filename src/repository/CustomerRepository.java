@@ -7,12 +7,21 @@ import java.util.stream.Collectors;
 
 import static utility.Bootstrap.getMockCustomers;
 
-public class CustomerRepository extends CrudRepository<Customer> {
+public final class CustomerRepository extends CrudRepository<Customer> {
 
-    private final OrderRepository orderRepository = new OrderRepository();
+    private static CustomerRepository instance = null;
+    private final OrderRepository orderRepository = OrderRepository.getInstance();
 
-    public CustomerRepository() {
+    private CustomerRepository() {
         super(getMockCustomers());
+    }
+
+    public static CustomerRepository getInstance()
+    {
+        if (instance == null){
+            instance = new CustomerRepository();
+        }
+        return instance;
     }
 
     public List<Customer> findCustomersWhoHaveNotPlacedAnOrder() {

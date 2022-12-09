@@ -6,23 +6,26 @@ import entity.Product;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.summingDouble;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static utility.Bootstrap.getMockOrders;
 
-public class OrderRepository extends CrudRepository<Order> {
+public final class OrderRepository extends CrudRepository<Order> {
 
-    public OrderRepository() {
+    private static OrderRepository instance = null;
+
+    private OrderRepository() {
         super(getMockOrders());
+    }
+
+    public static OrderRepository getInstance() {
+        if (instance == null) {
+            instance = new OrderRepository();
+        }
+        return instance;
     }
 
     public boolean doesCustomerHaveOrder(UUID customerId) {

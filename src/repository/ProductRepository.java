@@ -15,12 +15,21 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static utility.Bootstrap.getMockProducts;
 
-public class ProductRepository extends CrudRepository<Product> {
+public final class ProductRepository extends CrudRepository<Product> {
 
-    private final OrderRepository orderRepository = new OrderRepository();
+    private static ProductRepository instance = null;
+    private final OrderRepository orderRepository = OrderRepository.getInstance();
 
-    public ProductRepository() {
+    private ProductRepository() {
         super(getMockProducts());
+    }
+
+    public static ProductRepository getInstance()
+    {
+        if (instance == null){
+            instance = new ProductRepository();
+        }
+        return instance;
     }
 
     public List<Product> getProductsThatHaveNotBeenPurchased() {

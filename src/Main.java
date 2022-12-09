@@ -4,9 +4,9 @@ import repository.ProductRepository;
 
 public class Main {
 
-    private static final OrderRepository orderRepository = new OrderRepository();
-    private static final CustomerRepository customerRepository = new CustomerRepository();
-    private static final ProductRepository productRepository = new ProductRepository();
+    private static final OrderRepository orderRepository = OrderRepository.getInstance();
+    private static final CustomerRepository customerRepository = CustomerRepository.getInstance();
+    private static final ProductRepository productRepository = ProductRepository.getInstance();
 
     // ! https://blog.devgenius.io/15-practical-exercises-help-you-master-java-stream-api-3f9c86b1cf82
 
@@ -82,7 +82,7 @@ public class Main {
 
         // System.out.println(productRepository.getProductNamesGroupedByCategory());
 
-        // Get the most expensive product by category
-        // System.out.println(productRepository.getMostExpensiveProductByCategory());
+         // Get the most expensive product by category
+         // System.out.println(productRepository.getMostExpensiveProductByCategory());
     }
 }
