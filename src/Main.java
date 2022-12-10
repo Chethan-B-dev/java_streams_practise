@@ -9,6 +9,7 @@ public class Main {
     private static final ProductRepository productRepository = ProductRepository.getInstance();
 
     // ! https://blog.devgenius.io/15-practical-exercises-help-you-master-java-stream-api-3f9c86b1cf82
+    // ! https://binkurt.blogspot.com/2017/10/exercises-to-study-java-stream-api.html
 
     public static void main(String[] args) {
         // find all the customers who have not placed an order
@@ -59,15 +60,18 @@ public class Main {
         /*
         Map<Month, Double> allMonthsLumpSumOfYear = orderRepository.getAllMonthsLumpSumOfYear(2022);
         Map<Month, Double> allMonths = Arrays.stream(Month.values())
-                .collect(toMap(Function.identity(), month -> allMonthsLumpSumOfYear.getOrDefault(month, 0.0)));
+                                             .collect(toMap(
+                                                        Function.identity(),
+                                                        month -> allMonthsLumpSumOfYear.getOrDefault(month, 0.0)
+                                             ));
 
         allMonths.forEach((month, aDouble) -> System.out.println(month + " - " + aDouble));
         */
         // Calculate order average payment placed on 14-Mar-2021
         // System.out.println(orderRepository.orderAverageOnDate(LocalDate.parse("2021-03-14")));
 
-        //Obtain a collection of statistic figures (i.e. sum, average, max, min, count) for all products of category “Books”
-//        System.out.println(productRepository.getStatsOfBabyProducts());
+        // Obtain a collection of statistic figures (i.e. sum, average, max, min, count) for all products of category “Books”
+        // System.out.println(productRepository.getStatsOfBabyProducts());
         // Obtain a data map with order id and order’s product count
 
         // System.out.println(orderRepository.getMapOrderIdAndProductCount());
@@ -82,7 +86,7 @@ public class Main {
 
         // System.out.println(productRepository.getProductNamesGroupedByCategory());
 
-         // Get the most expensive product by category
-         // System.out.println(productRepository.getMostExpensiveProductByCategory());
+        // Get the most expensive product by category
+        // System.out.println(productRepository.getMostExpensiveProductByCategory());
     }
 }
