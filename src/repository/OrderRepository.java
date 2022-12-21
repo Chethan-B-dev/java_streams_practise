@@ -51,13 +51,20 @@ public final class OrderRepository extends CrudRepository<Order> {
 
 
     public Order getOrderWithMaximumPurchase() {
-        return this.findAll()
+        Order firstSolution = this.findAll()
                 .stream()
                 .max((orderA, orderB) -> {
                     Double priceA = getPriceSumOfOrder(orderA.getId());
                     Double priceB = getPriceSumOfOrder(orderB.getId());
                     return priceA.compareTo(priceB);
                 }).orElse(null);
+
+        Order secondSolution = this.findAll()
+                .stream()
+                .max(Comparator.comparingDouble(Order::getTotalPrice))
+                .orElse(null);
+
+        return secondSolution;
     }
 
     public boolean hasProductBeenPurchased(Product product) {
@@ -74,7 +81,7 @@ public final class OrderRepository extends CrudRepository<Order> {
                         .map(Product::getCategory)
                         .anyMatch(category -> category.equals("Baby"))
                 )
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public Set<Product> getProductsWithTier2Date() {
@@ -82,10 +89,10 @@ public final class OrderRepository extends CrudRepository<Order> {
                 .stream()
                 .filter(order -> order.getCustomer().getTier().equals(2))
                 .filter(order -> order.getDeliveryDate().isAfter(LocalDate.parse("2021-02-01")))
-                .filter(order -> order.getDeliveryDate().isBefore(LocalDate.parse("2021-04-01")))
+                .filter(order -> order.getDeliveryDate().isBefore(LocalDate.of(2021, 4, 1)))
                 .map(Order::getProducts)
                 .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     public List<Order> getThreeMostRecentOrders() {
@@ -93,7 +100,7 @@ public final class OrderRepository extends CrudRepository<Order> {
                 .stream()
                 .sorted(Comparator.comparing(Order::getOrderDate).reversed())
                 .limit(3)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public List<Product> getOnDate() {
@@ -101,9 +108,10 @@ public final class OrderRepository extends CrudRepository<Order> {
                 .stream()
                 .filter(o -> o.getOrderDate().isEqual(LocalDate.of(2021, 3, 15)))
                 .peek(System.out::println)
-                .flatMap(o -> o.getProducts().stream())
+                .map(Order::getProducts)
+                .flatMap(Set::stream)
                 .distinct()
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public Double getLumpSumInYear(int year, int month) {
@@ -121,16 +129,20 @@ public final class OrderRepository extends CrudRepository<Order> {
         return this.findAll()
                 .stream()
                 .filter(order -> order.getOrderDate().getYear() == year)
-                .collect(groupingBy(order -> order.getOrderDate().getMonth(),
-                        summingDouble(order -> order.getProducts().stream().mapToDouble(Product::getPrice).sum())
-                ));
+                .collect(
+                        groupingBy(
+                                order -> order.getOrderDate().getMonth(),
+                                summingDouble(Order::getTotalPrice)
+                        )
+                );
     }
 
     public Double orderAverageOnDate(LocalDate date) {
         return this.findAll()
                 .stream()
                 .filter(o -> o.getOrderDate().isEqual(date))
-                .flatMap(o -> o.getProducts().stream())
+                .map(Order::getProducts)
+                .flatMap(Set::stream)
                 .mapToDouble(Product::getPrice)
                 .average()
                 .orElse(0.0);
@@ -139,7 +151,12 @@ public final class OrderRepository extends CrudRepository<Order> {
     public Map<UUID, Integer> getMapOrderIdAndProductCount() {
         return this.findAll()
                 .stream()
-                .collect(toMap(Order::getId, order -> order.getProducts().size()));
+                .collect(
+                        toMap(
+                                Order::getId,
+                                Order::getTotalProducts
+                        )
+                );
     }
 
     public Map<Customer, List<Order>> getOrdersGroupedByCustomers() {
@@ -154,11 +171,7 @@ public final class OrderRepository extends CrudRepository<Order> {
                 .collect(
                         Collectors.toMap(
                                 Function.identity(),
-                                order -> order
-                                        .getProducts()
-                                        .stream()
-                                        .mapToDouble(Product::getPrice)
-                                        .sum()
+                                Order::getTotalPrice
                         )
                 );
     }

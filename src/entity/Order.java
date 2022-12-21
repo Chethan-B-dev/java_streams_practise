@@ -24,6 +24,18 @@ public class Order extends BaseEntity{
         this.customer = customer;
     }
 
+    public double getTotalPrice() {
+        return this.products
+                .stream()
+                .filter(Objects::nonNull)
+                .mapToDouble(Product::getPrice)
+                .sum();
+    }
+
+    public int getTotalProducts() {
+        return this.products.size();
+    }
+
     public LocalDate getOrderDate() {
         return orderDate;
     }
